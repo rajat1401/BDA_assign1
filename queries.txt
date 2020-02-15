@@ -1,0 +1,124 @@
+Q1.
+
+
+Question2.
+SELECT COUNT(*) FROM schemma_bda_1.mytable
+
+Question3. 
+SELECT COUNT(*) FROM schemma_bda_1.mytable WHERE log_lvl= 'WARN'
+
+
+Question4.
+select COUNT(DISTINCT repo)
+from schemma_bda_1.mytable 
+where retrval_stage= ' api_client.rb' and log_lvl= 'WARN'
+
+
+Question5.
+Select dwnlder_id, count(*) as c 
+from schemma_bda_1.mytable 
+where mssg like '%https://api.github.com%' 
+group by dwnlder_id 
+order by c 
+desc 
+limit 10;
+
+
+Question 6.
+Select dwnlder_id, count(*) as c 
+from schemma_bda_1.mytable 
+where mssg like '_Failed%' 
+group by dwnlder_id 
+order by c 
+desc 
+limit 10;
+
+
+Question7.
+SELECT COUNT(*) as C, substring(tb.timestamp from 11 for 3) as H
+FROM schemma_bda_1.mytable as tb 
+WHERE mssg like '%https://%' 
+GROUP BY H
+ORDER BY C
+DESC LIMIT 1
+
+
+Question8. 
+select count(*) as c, repo
+from schemma_bda_1.mytable
+where (mssg like '%api.github.com/repos/%')
+group by repo
+order by c
+desc
+limit 5
+
+
+Question 9.
+select substring(tb.mssg for 11 from position('Access' in tb.mssg)+8 ) as fstrng,count(*) as cnt
+from schemma_bda_1.mytable as tb 
+where mssg like '%Access:%' and mssg like '%Failed request.%'
+group by fstrng
+order by cnt
+desc
+limit 1
+
+
+Question 10.
+DO $proc$
+DECLARE
+  StartTime timestamptz;
+  EndTime timestamptz;
+  Delta double precision;
+BEGIN
+  StartTime := clock_timestamp();
+  perform distinct count(*) as M
+  from schemma_bda_1.mytable
+  where dwnlder_id =' ghtorrent-22';
+  EndTime := clock_timestamp();
+  Delta := 1000 * ( extract(epoch from EndTime) - extract(epoch from StartTime) );
+  RAISE NOTICE 'Duration in millisecs=%', Delta;
+END;
+$proc$;
+
+
+Question 11.
+CREATE INDEX downindex on TABLE schemma_bda_1.tab(dwnlder_id);
+DO $proc$
+DECLARE
+  StartTime timestamptz;
+  EndTime timestamptz;
+  Delta double precision;
+BEGIN
+  StartTime := clock_timestamp();
+  perform distinct count(*) as M
+  from schemma_bda_1.tab
+  where dwnlder_id =' ghtorrent-22';
+  EndTime := clock_timestamp();
+  Delta := 1000 * ( extract(epoch from EndTime) - extract(epoch from StartTime) );
+  RAISE NOTICE 'Duration in millisecs=%', Delta;
+END;
+$proc$;
+
+
+Question 12.
+COPY schemma_dw_1.interesting FROM '/tmp/important-repos.csv' (DELIMITER(','));
+
+
+Question 13.
+select count(*) from
+(select substring(repo from Position('/' in repo) +1) as repp
+from schemma_bda_1.mytable
+where (mssg like '%api.github.com/repos/%')) as A inner join schemma_bda_1.interesting as B
+on A.repp = B.nme
+
+Question14.
+select count(*) as c, substring(M.repo from Position('/' in repo)+1) as repp
+from schemma_bda_1.interesting as I, schemma_bda_1.mytable as M
+where M.mssg like '_Failed%' and I.nme= substring(M.repo from Position('/' in repo)+1)
+group by repp
+order by c
+desc
+limit 10
+
+
+COPY (select * from schemma_dw_1.equalification) TO '/tmp/equalification.csv' with csv;
